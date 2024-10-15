@@ -24,7 +24,11 @@
           md="4"
           lg="3"
         >
-          <ProductsCard :product="product" @product-deleted="removeProduct" />
+          <ProductsCard
+            :product="product"
+            @product-deleted="removeProduct"
+            @update-product="updateProduct"
+          />
         </v-col>
       </v-row>
     </v-app>
@@ -69,6 +73,25 @@ const addProduct = (newProduct: Products) => {
 const removeProduct = (documentId: string) => {
   products.value = products.value.filter(product => product.documentId !== documentId);
 };
+
+// Update a product in the list when it is edited
+// Update a product in the list when it is edited
+const updateProduct = (updatedProduct: Products) => {
+  // Check if the updatedProduct has a valid documentId
+  if (!updatedProduct || !updatedProduct.documentId) {
+    console.error("Invalid product for update:", updatedProduct);
+    return; // Exit if the updated product is invalid
+  }
+
+  const index = products.value.findIndex(product => product.documentId === updatedProduct.documentId);
+  
+  if (index !== -1) {
+    products.value[index] = updatedProduct;
+  } else {
+    console.error("Product not found for update:", updatedProduct);
+  }
+};
+
 
 onMounted(() => {
   fetchProducts();

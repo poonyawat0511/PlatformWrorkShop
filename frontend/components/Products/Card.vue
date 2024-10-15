@@ -15,7 +15,7 @@
       <v-btn @click="deleteProduct">
         <v-icon class="mdi mdi-delete-empty" color="red"></v-icon>
       </v-btn>
-      <v-btn @click="editProduct">
+      <v-btn @click="openEditDialog">
         <v-icon class="mdi mdi-pencil-outline"></v-icon>
       </v-btn>
     </v-card-actions>
@@ -26,10 +26,18 @@
         <v-card-text>{{ product.description }}</v-card-text>
       </div>
     </v-expand-transition>
+    <!-- Include the EditDialog and bind the product and dialog state -->
+    <EditDialog
+      v-model="showEditDialog"
+      :product="product"
+      @update-product="updateProduct"
+    />
   </v-card>
 </template>
 
 <script>
+import EditDialog from "./EditDialog.vue";
+
 export default {
   props: {
     product: {
@@ -40,6 +48,7 @@ export default {
   data() {
     return {
       show: false,
+      showEditDialog: false, // State to control the visibility of the EditDialog
     };
   },
   methods: {
@@ -52,7 +61,7 @@ export default {
           }
         );
         if (response.ok) {
-          this.$emit("product-deleted", this.product.documentId); // ส่งอีเวนต์เพื่อแจ้งให้พ่อแม่ทราบ
+          this.$emit("product-deleted", this.product.documentId);
         } else {
           console.error("Error deleting product:", response.statusText);
         }
@@ -60,9 +69,17 @@ export default {
         console.error("Error deleting product:", error);
       }
     },
-    editProduct() {
-      this.$emit("edit-product", this.product); // ส่งอีเวนต์แก้ไข
+    openEditDialog() {
+      this.showEditDialog = true; // Open the Edit dialog when the button is clicked
     },
+    updateProduct(updatedProduct) {
+      // Emit the updated product to the parent component
+      this.$emit("update-product", updatedProduct);
+      this.showEditDialog = false;
+    },
+  },
+  components: {
+    EditDialog,
   },
 };
 </script>
